@@ -4,14 +4,15 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const app = express()
 const mongoose = require('mongoose')
+const User = require('./models/User');
 
-mongoose.connect('mongodb://localhost:27017/auth')
+const dbUser = process.env.DB_USER
+const dbPassword = process.env.DB_PASS
 
-const UserSchema = new mongoose.Schema({
-    name: String,
-    email: String,
-    password: String
-})
+mongoose.connect(`mongodb+srv://${dbUser}:${dbPassword}@cluster0.j41wwnm.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`).then(() => {
+  app.listen(3000)
+  console.log('Conectou ao Banco')
+}).catch((err) => console.log(err))
 
 
 //Config JSON response
@@ -122,7 +123,7 @@ app.post("/auth/login", async (req, res) => {
   }
 
   // check if password match
-  const checkPassword = await bcrypt.compare(password, user.password);
+  const checkPassword =  bcrypt.compare(password, user.password);
 
   if (!checkPassword) {
     return res.status(422).json({ msg: "Senha inválida" });
